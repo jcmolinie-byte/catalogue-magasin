@@ -1,0 +1,25 @@
+{
+  "updated": "22/03/2026",
+  "articles": [
+    { "ref": "100001", "label": "Roulement à billes SKF 6205", "location": "A01-01" },
+    { "ref": "100002", "label": "Joint torique NBR 50x3", "location": "A01-02" },
+    { "ref": "100003", "label": "Courroie trapézoïdale SPA 1250", "location": "A02-01" },
+    { "ref": "100004", "label": "Palier UCP 207 fonte", "location": "A02-02" },
+    { "ref": "100005", "label": "Fusible 10A 10x38", "location": "B01-01" },
+    { "ref": "100006", "label": "Fusible 16A 10x38", "location": "B01-01" },
+    { "ref": "100007", "label": "Contacteur LC1D25 Schneider", "location": "B01-02" },
+    { "ref": "100008", "label": "Disjoncteur moteur GV2ME10", "location": "B01-03" },
+    { "ref": "100009", "label": "Pompe à engrenages 5L/min", "location": "C01-01" },
+    { "ref": "100010", "label": "Clapet anti-retour 1/2 pouce", "location": "C01-02" },
+    { "ref": "100011", "label": "Vanne à boisseau 3/4 pouce inox", "location": "C02-01" },
+    { "ref": "100012", "label": "Raccord union 1 pouce laiton", "location": "C02-02" },
+    { "ref": "100013", "label": "Tuyau flexible huile DN25 1m", "location": "C03-01" },
+    { "ref": "100014", "label": "Joint plat PTFE 60x45x3", "location": "A01-03" },
+    { "ref": "100015", "label": "Rondelle Grower M12 acier", "location": "D01-01" },
+    { "ref": "100016", "label": "Ecrou HM M16 classe 8", "location": "D01-02" },
+    { "ref": "100017", "label": "Boulon M10x40 6.8 tête hexagonale", "location": "D01-03" },
+    { "ref": "100018", "label": "Huile hydraulique HV46 bidon 20L", "location": "E01-01" },
+    { "ref": "100019", "label": "Graisse universelle NLGI 2 cartouche 400g", "location": "E01-02" },
+    { "ref": "100020", "label": "Filtre à air comprimé G1/2 40mu", "location": "C03-02" }
+  ]
+}
