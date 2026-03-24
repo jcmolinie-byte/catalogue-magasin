@@ -457,6 +457,110 @@
       letter-spacing: 0.05em;
     }
 
+    /* ── RAPPEL SAP ── */
+    #rappel-bandeau {
+      display: none;
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      border: 1px solid #ffc107;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      animation: rowIn 0.3s ease;
+    }
+
+    .rappel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .rappel-title {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #856404;
+    }
+
+    .rappel-article {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: #856404;
+      opacity: 0.8;
+      margin-top: 3px;
+    }
+
+    .btn-confirmer {
+      background: #1a5cb8;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      color: white;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-confirmer:hover { background: #1a3a6b; }
+
+    .btn-rappel {
+      background: #e05c2a;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: white;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-rappel:hover { background: #c04020; }
+
+    /* Bouton caméra — mobile uniquement */
+    .btn-camera {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .btn-camera {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a5cb8;
+        border: none;
+        border-radius: 7px;
+        padding: 0 0.75rem;
+        height: 38px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+    }
+
+    /* Bouton rappel dans les lignes du tableau */
+    .td-action { width: 50px; text-align: center; }
+    .btn-prendre {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.15s;
+    }
+    .btn-prendre:hover {
+      background: #e05c2a;
+      border-color: #e05c2a;
+      color: white;
+    }
+
     /* ── RESPONSIVE ── */
     .mobile-cards { display: none; }
 
@@ -549,13 +653,27 @@
 
 
 
+    <!-- Bandeau rappel SAP -->
+    <div id="rappel-bandeau">
+      <div class="rappel-header">
+        <div>
+          <div class="rappel-title">⚠️ Rappel sortie SAP en cours</div>
+          <div class="rappel-article" id="rappel-article-info"></div>
+        </div>
+        <button class="btn-confirmer" onclick="confirmerRappel()">✅ Sortie SAP faite</button>
+      </div>
+    </div>
+
     <!-- Search -->
     <div class="search-panel">
       <div class="search-panel-title">▸ Recherche</div>
       <div class="search-row">
-        <div class="field-group">
-          <label class="field-label" for="search-ref">N° Article</label>
-          <input class="field-input" id="search-ref" type="text" placeholder="ex: 100234" />
+        <div class="field-group" style="flex-direction:row;align-items:flex-end;gap:6px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+            <label class="field-label" for="search-ref">N° Article</label>
+            <input class="field-input" id="search-ref" type="text" placeholder="ex: 100234" />
+          </div>
+          <button class="btn-camera" id="btn-camera" onclick="ouvrirCamera()" title="Prendre une photo">📷</button>
         </div>
         <div class="field-group">
           <label class="field-label" for="search-label">Désignation</label>
@@ -591,6 +709,7 @@
             <th data-col="location">
               Emplacement <span class="sort-arrow">↕</span>
             </th>
+            <th style="width:50px"></th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -793,15 +912,21 @@ function renderTable() {
       <td class="td-ref">${highlight(r.ref, qRef)}</td>
       <td class="td-label">${highlight(r.label, qLabel)}</td>
       <td class="td-location"><span class="badge-location">${highlight(r.location, qLoc)}</span></td>
+      <td class="td-action"><button class="btn-prendre" onclick="prendrePiece('${esc(r.ref)}','${esc(r.label)}')">📷</button></td>
     </tr>
   `).join('');
 
   // Cartes mobile
   mcards.innerHTML = page.map((r, i) => `
     <div class="m-card" style="animation-delay:${i * 8}ms">
-      <div class="m-card-ref">${highlight(r.ref, qRef)}</div>
-      <div class="m-card-label">${highlight(r.label, qLabel)}</div>
-      <span class="m-card-loc">${highlight(r.location, qLoc)}</span>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <div class="m-card-ref">${highlight(r.ref, qRef)}</div>
+          <div class="m-card-label">${highlight(r.label, qLabel)}</div>
+          <span class="m-card-loc">${highlight(r.location, qLoc)}</span>
+        </div>
+        <button class="btn-rappel" onclick="prendrePiece('${esc(r.ref)}','${esc(r.label)}')">📷 Pris</button>
+      </div>
     </div>
   `).join('');
 }
@@ -870,6 +995,155 @@ function goPage(p) {
   renderPagination();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ─── RAPPEL SAP ────────────────────────────────────────────────────────────
+const API_URL = 'https://catalogue-rappels-api.onrender.com';
+let rappelId = localStorage.getItem('rappelId') || null;
+let rappelInfo = localStorage.getItem('rappelInfo') || null;
+
+function ouvrirCamera() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+  input.onchange = () => {
+    document.body.removeChild(input);
+    if (!input.files || !input.files[0]) return;
+    // Photo prise — demander si on veut créer un rappel
+    const ref = document.getElementById('search-ref').value.trim();
+    const label = document.getElementById('search-label').value.trim();
+    if (ref || label) {
+      const articleInfo = ref || label;
+      if (confirm(`📷 Photo prise !\n\nCréer un rappel SAP pour : ${articleInfo} ?`)) {
+        creerRappel(ref, label);
+      }
+    } else {
+      alert('📷 Photo prise et enregistrée sur votre téléphone.');
+    }
+  };
+  input.oncancel = () => document.body.removeChild(input);
+  input.click();
+}
+
+async function creerRappel(ref, label) {
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') {
+    alert('Veuillez autoriser les notifications pour activer le rappel SAP.');
+    return;
+  }
+  const reg = await navigator.serviceWorker.ready;
+  const keyRes = await fetch(API_URL + '/vapid-public-key');
+  const { publicKey } = await keyRes.json();
+  let subscription;
+  try {
+    subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+  } catch (e) {
+    alert('Impossible de s\'abonner aux notifications : ' + e.message);
+    return;
+  }
+  const res = await fetch(API_URL + '/rappels', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ articleRef: ref, articleLabel: label, subscription })
+  });
+  const data = await res.json();
+  rappelId = data.id;
+  rappelInfo = `Article ${ref || label}`;
+  localStorage.setItem('rappelId', rappelId);
+  localStorage.setItem('rappelInfo', rappelInfo);
+  afficherBandeau();
+  alert('✅ Rappel SAP activé ! Tu seras notifié toutes les heures.');
+}
+
+
+  // Ouvrir la caméra pour prendre une photo
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment'; // caméra arrière
+  input.style.display = 'none';
+  document.body.appendChild(input);
+
+  input.onchange = async () => {
+    document.body.removeChild(input);
+    if (!input.files || !input.files[0]) return;
+
+    // Photo prise — maintenant créer le rappel
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      alert('Veuillez autoriser les notifications pour activer le rappel SAP.');
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.ready;
+    const keyRes = await fetch(API_URL + '/vapid-public-key');
+    const { publicKey } = await keyRes.json();
+
+    let subscription;
+    try {
+      subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey)
+      });
+    } catch (e) {
+      alert('Impossible de s\'abonner aux notifications : ' + e.message);
+      return;
+    }
+
+    const res = await fetch(API_URL + '/rappels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articleRef: ref, articleLabel: label, subscription })
+    });
+    const data = await res.json();
+
+    rappelId = data.id;
+    rappelInfo = `Article ${ref} — ${label}`;
+    localStorage.setItem('rappelId', rappelId);
+    localStorage.setItem('rappelInfo', rappelInfo);
+
+    afficherBandeau();
+    alert('📷 Photo prise ! Tu recevras un rappel toutes les heures jusqu\'à confirmation de la sortie SAP.');
+  };
+
+  input.oncancel = () => document.body.removeChild(input);
+  input.click();
+}
+
+async function confirmerRappel() {
+  if (!rappelId) return;
+  await fetch(API_URL + '/rappels/' + rappelId + '/confirmer', { method: 'POST' });
+  rappelId = null;
+  rappelInfo = null;
+  localStorage.removeItem('rappelId');
+  localStorage.removeItem('rappelInfo');
+  document.getElementById('rappel-bandeau').style.display = 'none';
+  alert('✅ Sortie SAP confirmée ! Rappel désactivé.');
+}
+
+function afficherBandeau() {
+  if (!rappelId) return;
+  const bandeau = document.getElementById('rappel-bandeau');
+  bandeau.style.display = 'block';
+  document.getElementById('rappel-article-info').textContent = rappelInfo || '';
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+// Afficher bandeau si rappel en cours au chargement
+afficherBandeau();
 
 // ─── START ─────────────────────────────────────────────────────────────────
 init();
