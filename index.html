@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalogue Magasin</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1a5cb8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Catalogue" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface2: #eef1f6;
+      --border: #d4dae6;
+      --accent: #1a5cb8;
+      --accent2: #e05c2a;
+      --text: #1a2133;
+      --text-dim: #5a6478;
+      --text-muted: #9aa0b0;
+      --success: #1a9e5c;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,92,184,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,92,184,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #1a3a6b 0%, #1a5cb8 100%);
+      padding: 0 2rem;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+    }
+
+    .logo-sub {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .header-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.6);
+      text-align: right;
+    }
+
+    #last-updated {
+      color: #ffd080;
+    }
+
+    /* ── MAIN ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stat-icon {
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    /* ── SEARCH PANEL ── */
+    .search-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-panel-title {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr auto;
+      gap: 0.75rem;
+      align-items: end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .field-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.6rem 0.9rem;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,92,184,0.1);
+    }
+
+    .field-input::placeholder { color: var(--text-muted); }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.6rem 1rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-reset:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* ── RESULTS INFO ── */
+    .results-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+    }
+
+    .results-count {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .results-count span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .pagination-info {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 0.85rem 1.25rem;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+
+    th:hover { color: var(--accent); }
+
+    th.sorted { color: var(--accent); }
+
+    th .sort-arrow {
+      margin-left: 4px;
+      opacity: 0.4;
+      font-size: 0.6rem;
+    }
+
+    th.sorted .sort-arrow { opacity: 1; }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(42,48,69,0.5);
+      transition: background 0.15s;
+      animation: rowIn 0.2s ease both;
+    }
+
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    tbody tr:hover { background: rgba(26,92,184,0.04); }
+    tbody tr:last-child { border-bottom: none; }
+
+    td {
+      padding: 0.8rem 1.25rem;
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+
+    .td-ref {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .td-label {
+      color: var(--text);
+      max-width: 480px;
+    }
+
+    .td-location {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+    }
+
+    .badge-location {
+      display: inline-block;
+      background: rgba(26,92,184,0.08);
+      border: 1px solid rgba(26,92,184,0.2);
+      color: #1a5cb8;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    /* highlight */
+    mark {
+      background: rgba(26,92,184,0.15);
+      color: #1a3a8a;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-msg { font-family: var(--mono); font-size: 0.85rem; }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0f1117;
+      font-weight: 600;
+    }
+
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── LOADING ── */
+    #loading {
+      text-align: center;
+      padding: 4rem;
+      font-family: var(--mono);
+      color: var(--text-dim);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 32px; height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR ── */
+    #error-msg {
+      display: none;
+      background: rgba(224,92,42,0.08);
+      border: 1px solid rgba(224,92,42,0.25);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: #c04020;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── RAPPEL SAP ── */
+    #rappel-bandeau {
+      display: none;
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      border: 1px solid #ffc107;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      animation: rowIn 0.3s ease;
+    }
+
+    .rappel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .rappel-title {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #856404;
+    }
+
+    .rappel-article {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: #856404;
+      opacity: 0.8;
+      margin-top: 3px;
+    }
+
+    .btn-confirmer {
+      background: #1a5cb8;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      color: white;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-confirmer:hover { background: #1a3a6b; }
+
+    .btn-rappel {
+      background: #e05c2a;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: white;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-rappel:hover { background: #c04020; }
+
+    .ref-input-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .ref-input-wrap .field-input { flex: 1; }
+
+    .btn-camera {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a5cb8;
+      border: none;
+      border-radius: 7px;
+      padding: 0 0.75rem;
+      height: 38px;
+      min-width: 42px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Bouton rappel dans les lignes du tableau */
+    .td-action { width: 50px; text-align: center; }
+    .btn-prendre {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.15s;
+    }
+    .btn-prendre:hover {
+      background: #e05c2a;
+      border-color: #e05c2a;
+      color: white;
+    }
+
+    /* ── RESPONSIVE ── */
+    .mobile-cards { display: none; }
+
+    @media (max-width: 768px) {
+      main { padding: 0.75rem; }
+
+      .search-row {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+      }
+
+      .search-row .field-group:nth-child(2) {
+        grid-column: 1 / -1;
+      }
+
+      .search-row .btn-reset {
+        grid-column: 1 / -1;
+      }
+
+      .table-wrap table { display: none; }
+      .mobile-cards { display: block !important; }
+
+      td, th { padding: 0.6rem 0.75rem; }
+    }
+
+    /* ── CARTES MOBILE ── */
+    .m-card {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(212,218,230,0.5);
+      animation: rowIn 0.2s ease both;
+    }
+
+    .m-card:last-child { border-bottom: none; }
+
+    .m-card-ref {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+
+    .m-card-label {
+      font-size: 0.875rem;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .m-card-loc {
+      display: inline-block;
+      background: rgba(26,92,184,0.08);
+      border: 1px solid rgba(26,92,184,0.2);
+      color: #1a5cb8;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    /* ── BANDEAU MESSAGE ── */
+    #bandeau-message {
+      display: none;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+    #bandeau-message.warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+    }
+    #bandeau-message.error {
+      background: rgba(224,92,42,0.08);
+      border: 1px solid rgba(224,92,42,0.4);
+      color: #c04020;
+    }
+    .bandeau-msg-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .bandeau-msg-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .bandeau-msg-body {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+    .bandeau-msg-close {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      opacity: 0.6;
+      flex-shrink: 0;
+      padding: 0;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a2133;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      animation: fadeInUp 0.3s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📦</div>
+      <div>
+        <div class="logo-text">CATALOGUE MAGASIN</div>
+        <div class="logo-sub">Nesle</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      Mis à jour le <span id="last-updated">—</span><br>
+      <span id="total-count-header">—</span> articles
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div>Chargement du catalogue…</div>
+  </div>
+
+  <div id="error-msg"></div>
+
+  <div id="app" style="display:none">
+
+
+
+    <!-- Bandeau message erreur/warning -->
+    <div id="bandeau-message">
+      <div class="bandeau-msg-header">
+        <div>
+          <div class="bandeau-msg-title" id="bandeau-msg-title"></div>
+          <div class="bandeau-msg-body" id="bandeau-msg-body"></div>
+        </div>
+        <button class="bandeau-msg-close" onclick="document.getElementById('bandeau-message').style.display='none'">✕</button>
+      </div>
+    </div>
+
+    <!-- Bandeau rappel SAP -->
+    <div id="rappel-bandeau">
+      <div class="rappel-header">
+        <div>
+          <div class="rappel-title">⚠️ Rappel sortie SAP en cours</div>
+          <div class="rappel-article" id="rappel-article-info"></div>
+        </div>
+        <button class="btn-confirmer" onclick="confirmerRappel()">✅ Sortie SAP faite</button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-panel">
+      <div class="search-panel-title">▸ Recherche</div>
+      <div class="search-row">
+        <div class="field-group ref-group">
+          <label class="field-label" for="search-ref">N° Article</label>
+          <div class="ref-input-wrap">
+            <input class="field-input" id="search-ref" type="text" placeholder="ex: 100234" />
+            <button class="btn-camera" id="btn-camera" onclick="ouvrirCamera()" title="Prendre une photo">📷</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="search-label">Désignation</label>
+          <input class="field-input" id="search-label" type="text" placeholder="ex: roulement, joint, pompe…" />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="search-loc">Emplacement</label>
+          <input class="field-input" id="search-loc" type="text" placeholder="ex: A12, B03…" />
+        </div>
+        <button class="btn-reset" id="btn-reset">✕ Effacer</button>
+      </div>
+    </div>
+
+    <!-- Results info -->
+    <div class="results-info">
+      <div class="results-count">
+        <span id="result-count">0</span> résultat(s)
+      </div>
+      <div class="pagination-info" id="page-info"></div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-col="ref" class="sorted">
+              N° Article <span class="sort-arrow">▲</span>
+            </th>
+            <th data-col="label">
+              Désignation <span class="sort-arrow">↕</span>
+            </th>
+            <th data-col="location">
+              Emplacement <span class="sort-arrow">↕</span>
+            </th>
+            <th style="width:50px"></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div id="mobile-cards" class="mobile-cards"></div>
+      <div id="empty-state" class="empty-state" style="display:none">
+        <div class="empty-icon">🔎</div>
+        <div class="empty-msg">Aucun article ne correspond à votre recherche.</div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination"></div>
+
+  </div>
+</main>
+
+<footer>
+  CATALOGUE MAGASIN · Lecture seule · Données hébergées sur GitHub
+</footer>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const DATA_URL = 'catalogue.xlsx'; // fichier Excel dans le repo
+const PAGE_SIZE = 50;
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let allData = [];
+let filtered = [];
+let currentPage = 1;
+let sortCol = 'ref';
+let sortDir = 1; // 1=asc, -1=desc
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    // Chargement SheetJS
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+
+    const res = await fetch(DATA_URL + '?v=' + Date.now());
+    if (!res.ok) throw new Error(`HTTP ${res.status} — fichier catalogue.xlsx introuvable`);
+
+    const arrayBuffer = await res.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+    // Mapping colonnes Excel → clés internes
+    allData = rows.map(r => ({
+      ref:      String(r['Article']             || '').trim(),
+      label:    String(r['Désignation article'] || '').trim(),
+      location: String(r['Emplacemt'] !== undefined && r['Emplacemt'] !== '' ? r['Emplacemt'] : '').trim(),
+    })).filter(r => r.ref); // ignore lignes vides
+
+    // Stats
+    const locations = new Set(allData.map(r => r.location).filter(Boolean)).size;
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('stat-total', allData.length.toLocaleString('fr-FR'));
+    setEl('stat-locations', locations.toLocaleString('fr-FR'));
+    setEl('total-count-header', allData.length.toLocaleString('fr-FR'));
+    setEl('last-updated', new Date().toLocaleDateString('fr-FR'));
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+
+    applyFilters();
+    bindEvents();
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    const err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    err.innerHTML = `
+      <strong>⚠ Impossible de charger le catalogue</strong><br><br>
+      Erreur : ${e.message}<br><br>
+      Vérifiez que le fichier <code>catalogue.xlsx</code> est bien présent dans le repo GitHub.
+    `;
+  }
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (window.XLSX) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ─── EVENTS ────────────────────────────────────────────────────────────────
+function bindEvents() {
+  document.getElementById('search-ref').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+  document.getElementById('search-label').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+  document.getElementById('search-loc').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+  document.getElementById('btn-reset').addEventListener('click', resetFilters);
+
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (sortCol === col) sortDir *= -1;
+      else { sortCol = col; sortDir = 1; }
+      document.querySelectorAll('th[data-col]').forEach(t => {
+        t.classList.remove('sorted');
+        t.querySelector('.sort-arrow').textContent = '↕';
+      });
+      th.classList.add('sorted');
+      th.querySelector('.sort-arrow').textContent = sortDir === 1 ? '▲' : '▼';
+      currentPage = 1;
+      applyFilters();
+    });
+  });
+}
+
+function resetFilters() {
+  document.getElementById('search-ref').value = '';
+  document.getElementById('search-label').value = '';
+  document.getElementById('search-loc').value = '';
+  currentPage = 1;
+  applyFilters();
+}
+
+// ─── FILTER + SORT ─────────────────────────────────────────────────────────
+function applyFilters() {
+  const qRef   = norm(document.getElementById('search-ref').value);
+  const qLabel = norm(document.getElementById('search-label').value);
+  const qLoc   = norm(document.getElementById('search-loc').value);
+
+  filtered = allData.filter(r => {
+    if (qRef   && !norm(r.ref).includes(qRef)) return false;
+    if (qLabel && !norm(r.label).includes(qLabel))   return false;
+    if (qLoc   && !norm(r.location).includes(qLoc)) return false;
+    return true;
+  });
+
+  // Sort — emplacements qui commencent par la recherche en premier
+  filtered.sort((a, b) => {
+    if (qLoc) {
+      const aStarts = norm(a.location).startsWith(qLoc);
+      const bStarts = norm(b.location).startsWith(qLoc);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+    }
+    const va = (a[colKey(sortCol)] || '').toString().toLowerCase();
+    const vb = (b[colKey(sortCol)] || '').toString().toLowerCase();
+    return va < vb ? -sortDir : va > vb ? sortDir : 0;
+  });
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('stat-filtered', filtered.length.toLocaleString('fr-FR'));
+  document.getElementById('result-count').textContent = filtered.length.toLocaleString('fr-FR');
+
+  renderTable();
+  renderPagination();
+}
+
+function colKey(col) {
+  return col === 'ref' ? 'ref' : col === 'label' ? 'label' : 'location';
+}
+
+function norm(str) {
+  return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+// ─── RENDER TABLE ──────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody  = document.getElementById('table-body');
+  const mcards = document.getElementById('mobile-cards');
+  const empty  = document.getElementById('empty-state');
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filtered.slice(start, start + PAGE_SIZE);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  document.getElementById('page-info').textContent =
+    filtered.length > PAGE_SIZE
+      ? `Page ${currentPage} / ${totalPages}`
+      : '';
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    mcards.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const qRef   = document.getElementById('search-ref').value.trim();
+  const qLabel = document.getElementById('search-label').value.trim();
+  const qLoc   = document.getElementById('search-loc').value.trim();
+
+  // Tableau desktop
+  tbody.innerHTML = page.map((r, i) => `
+    <tr style="animation-delay:${i * 8}ms">
+      <td class="td-ref">${highlight(r.ref, qRef)}</td>
+      <td class="td-label">${highlight(r.label, qLabel)}</td>
+      <td class="td-location"><span class="badge-location">${highlight(r.location, qLoc)}</span></td>
+      <td class="td-action"><button class="btn-prendre" onclick="ouvrirCamera()">📷</button></td>
+    </tr>
+  `).join('');
+
+  // Cartes mobile
+  mcards.innerHTML = page.map((r, i) => `
+    <div class="m-card" style="animation-delay:${i * 8}ms">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <div class="m-card-ref">${highlight(r.ref, qRef)}</div>
+          <div class="m-card-label">${highlight(r.label, qLabel)}</div>
+          <span class="m-card-loc">${highlight(r.location, qLoc)}</span>
+        </div>
+        <button class="btn-rappel" onclick="ouvrirCamera()">📷 Pris</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function highlight(text, query) {
+  if (!query) return esc(text);
+  const re = new RegExp('(' + escRe(query) + ')', 'gi');
+  return esc(text).replace(re, '<mark>$1</mark>');
+}
+
+function esc(str) {
+  return (str || '').toString()
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escRe(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ─── PAGINATION ────────────────────────────────────────────────────────────
+function renderPagination() {
+  const container = document.getElementById('pagination');
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+
+  if (total <= 1) { container.innerHTML = ''; return; }
+
+  let btns = '';
+
+  // Prev
+  btns += `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">‹ Préc</button>`;
+
+  // Pages
+  const range = pageRange(currentPage, total);
+  range.forEach(p => {
+    if (p === '…') {
+      btns += `<span style="color:var(--text-muted);font-family:var(--mono);padding:0 4px">…</span>`;
+    } else {
+      btns += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    }
+  });
+
+  // Next
+  btns += `<button class="page-btn" ${currentPage===total?'disabled':''} onclick="goPage(${currentPage+1})">Suiv ›</button>`;
+
+  container.innerHTML = btns;
+}
+
+function pageRange(cur, total) {
+  if (total <= 7) return Array.from({length: total}, (_,i) => i+1);
+  const pages = [];
+  if (cur <= 4) {
+    for (let i=1; i<=5; i++) pages.push(i);
+    pages.push('…', total);
+  } else if (cur >= total - 3) {
+    pages.push(1, '…');
+    for (let i=total-4; i<=total; i++) pages.push(i);
+  } else {
+    pages.push(1, '…', cur-1, cur, cur+1, '…', total);
+  }
+  return pages;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderTable();
+  renderPagination();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── RAPPEL SAP ────────────────────────────────────────────────────────────
+const API_URL = 'https://catalogue-rappels-api.onrender.com';
+let rappelId   = localStorage.getItem('rappelId')   || null;
+let rappelInfo = localStorage.getItem('rappelInfo') || null;
+
+async function ouvrirCamera() {
+  // Ouvre l'appareil photo natif — la photo est sauvée dans la galerie
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+
+  input.onchange = async () => {
+    document.body.removeChild(input);
+    if (!input.files || !input.files[0]) return;
+    // Photo prise → activer le rappel SAP
+    await activerRappel();
+  };
+
+  input.oncancel = () => document.body.removeChild(input);
+  input.click();
+}
+
+async function activerRappel() {
+  // Demander permission notifications
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') {
+    afficherBandeauMessage('🔔 Notifications refusées', 'Allez dans les paramètres de Chrome → Paramètres du site → Notifications → Autoriser jcmolinie-byte.github.io', 'warning');
+    return;
+  }
+
+  // Abonnement push via Service Worker
+  let subscription;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const keyRes = await fetch(API_URL + '/vapid-public-key');
+    const { publicKey } = await keyRes.json();
+    subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+  } catch (e) {
+    afficherBandeauMessage('❌ Erreur notifications', e.message, 'error');
+    return;
+  }
+
+  // Enregistrer le rappel sur le backend (toutes les 45 min)
+  const ref   = document.getElementById('search-ref').value.trim();
+  const label = document.getElementById('search-label').value.trim();
+  try {
+    const res = await fetch(API_URL + '/rappels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        articleRef: ref || '—',
+        articleLabel: label || '—',
+        intervalMinutes: 45,
+        subscription
+      })
+    });
+    const data = await res.json();
+    rappelId   = data.id;
+    rappelInfo = `Article ${ref || label || 'inconnu'}`;
+    localStorage.setItem('rappelId',   rappelId);
+    localStorage.setItem('rappelInfo', rappelInfo);
+    afficherBandeau();
+  } catch (e) {
+    afficherBandeauMessage('❌ Erreur backend', e.message, 'error');
+  }
+}
+
+async function confirmerRappel() {
+  if (!rappelId) return;
+  await fetch(API_URL + '/rappels/' + rappelId + '/confirmer', { method: 'POST' });
+  rappelId = null;
+  rappelInfo = null;
+  localStorage.removeItem('rappelId');
+  localStorage.removeItem('rappelInfo');
+  document.getElementById('rappel-bandeau').style.display = 'none';
+  showToast('✅ Sortie SAP confirmée ! Rappels désactivés.');
+}
+
+function afficherBandeau() {
+  if (!rappelId) return;
+  const bandeau = document.getElementById('rappel-bandeau');
+  bandeau.style.display = 'block';
+  document.getElementById('rappel-article-info').textContent = rappelInfo || '';
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+function afficherBandeauMessage(titre, corps, type = 'warning') {
+  const el = document.getElementById('bandeau-message');
+  document.getElementById('bandeau-msg-title').textContent = titre;
+  document.getElementById('bandeau-msg-body').textContent = corps;
+  el.className = type;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showToast(msg, duration = 3500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => { t.style.display = 'none'; }, duration);
+}
+
+// Afficher bandeau si rappel en cours au chargement
+afficherBandeau();
+
+// ─── START ─────────────────────────────────────────────────────────────────
+init();
+
+// ─── PWA ───────────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>
